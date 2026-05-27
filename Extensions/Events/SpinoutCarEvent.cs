@@ -105,6 +105,7 @@ namespace BFPlus.Extensions.Events
 
                 NPCControl spinoutMedal = EntityControl.CreateItem(parent.position, 2, (int)Medal.Spinout, Vector3.zero, -1);
                 spinoutMedal.activationflag = 992;
+                UnityEngine.Object.Destroy(MainManager.GetEntity(6).gameObject);
                 yield return EventControl.sec;
 
                 MainManager.ResetCamera();

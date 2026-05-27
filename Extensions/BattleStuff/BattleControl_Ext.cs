@@ -3989,6 +3989,7 @@ namespace BFPlus.Extensions
 
         IEnumerator DoWhirlaRang(EntityControl entity, bool usedByEnemy)
         {
+            battle.dontusecharge = true;
             int damage = 4;
             List<DamageOverride> overrides = new List<DamageOverride>() {
                 (DamageOverride)NewDamageOverride.FlipNoPierce,
@@ -4215,6 +4216,7 @@ namespace BFPlus.Extensions
 
         IEnumerator DoSpiroll(EntityControl entity, bool enemy, int target = 0)
         {
+            battle.dontusecharge = true;
             int tpRestore = 9;
             int hpRestore = 3 + 
                 (enemy ? 0 : BadgeHowManyEquipped((int)BadgeTypes.HealPlus, MainManager.instance.playerdata[battle.currentturn].trueid));

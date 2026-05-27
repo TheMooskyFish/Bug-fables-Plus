@@ -280,18 +280,15 @@ namespace BFPlus.Extensions
 
         public static void ChangeBugariaOutskirtsOutsideCity(MapControl __instance)
         {
-            if (MainManager.instance.flags[980])
-            {
-                GameObject carpet = Instantiate(MainManager_Ext.assetBundle.LoadAsset<GameObject>("CarpetPanel"));
-                carpet.GetComponent<MeshRenderer>().materials = new Material[] { MainManager.mainPlane, MainManager.outlinemain };
-                Transform association = __instance.transform.GetChild(1);
+            GameObject carpet = Instantiate(MainManager_Ext.assetBundle.LoadAsset<GameObject>("CarpetPanel"));
+            carpet.GetComponent<MeshRenderer>().materials = new Material[] { MainManager.mainPlane, MainManager.outlinemain };
+            Transform association = __instance.transform.GetChild(1);
 
-                carpet.transform.parent = association;
-                carpet.transform.localPosition = new Vector3(5.64f, 0.1f, 0.8f);
+            carpet.transform.parent = association;
+            carpet.transform.localPosition = new Vector3(5.64f, 0.1f, 0.8f);
 
-                CreateCloneObj(carpet, association, new Vector3(-19.6137f, 4.85f, 18.1912f),
-                    new Vector3(90, 0, 0), new Vector3(0.8066f, 0.7344f, 1));
-            }
+            CreateCloneObj(carpet, association, new Vector3(-19.6137f, 4.85f, 18.1912f),
+                new Vector3(90, 0, 0), new Vector3(0.8066f, 0.7344f, 1));
         }
 
         public static void ChangeSandCastleBossRoom(MapControl __instance)

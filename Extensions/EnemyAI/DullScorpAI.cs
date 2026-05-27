@@ -68,7 +68,6 @@ namespace BFPlus.Extensions.EnemyAI
             {
                 attacks[Attacks.IcyRocks] += 10;
             }
-            ;
 
             if (battle.enemydata[actionid].data[1] == 1)
             {

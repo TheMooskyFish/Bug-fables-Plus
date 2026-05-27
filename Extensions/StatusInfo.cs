@@ -130,7 +130,7 @@ namespace BFPlus.Extensions
 
                 if (option < 0)
                 {
-                    option = maxOptions;
+                    option = maxOptions-1;
                     while (holders[option] == null)
                     {
                         option--;
@@ -154,12 +154,11 @@ namespace BFPlus.Extensions
                         break;
                 }
 
-                if (option > maxOptions)
+                if (option >= maxOptions)
                 {
                     option = 0;
                 }
             }
-
 
             int maxRow = holders[option].GetConditionsAmount();
             int rowOption = holders[option].options;
