@@ -139,7 +139,7 @@ namespace BFPlus.Extensions.BattleStuff.Skills
             Vector3 startPos = vi.transform.position;
             Vector3 endPos = Vector3.Lerp(
                     MainManager.instance.playerdata[battle.partypointer[0]].battleentity.transform.position,
-                    MainManager.instance.playerdata[battle.partypointer[battle.partypointer.Length - 1]].battleentity.transform.position,
+                    MainManager.instance.playerdata[battle.partypointer[instance.playerdata.Length - 1]].battleentity.transform.position,
                     0.3f);
             endPos.z -= 0.65f;
 
