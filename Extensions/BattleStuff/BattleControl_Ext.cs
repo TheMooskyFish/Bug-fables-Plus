@@ -963,7 +963,7 @@ namespace BFPlus.Extensions
                 }
                 Instance.inEndOfTurnDamage = true;
 
-                if (MainManager.BadgeIsEquipped((int)Medal.Hailstorm) && Instance.CheckHailstorm())
+                if (MainManager.BadgeIsEquipped((int)Medal.Hailstorm) && Instance.CheckHailstorm() && battle.AliveEnemies() > 0)
                     yield return battle.StartCoroutine(Instance.DoHailStorm(false));
 
                 for (int i = 0; i != MainManager.instance.playerdata.Length; i++)
