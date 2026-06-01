@@ -75,7 +75,6 @@ namespace BFPlus.Extensions.EnemyAI
                 attacks.Remove(Attacks.IcyRocks);
             }
 
-
             Attacks attack = MainManager_Ext.GetWeightedResult(attacks);
             switch (attack)
             {
@@ -192,15 +191,16 @@ namespace BFPlus.Extensions.EnemyAI
 
                 int[] possibleEnemies = new int[] { (int)MainManager.AnimIDs.Cape, (int)NewAnimID.Frostfly };
                 //randomize enemy type
-                int choosenEnemy = (int)possibleEnemies[UnityEngine.Random.Range(0, possibleEnemies.Length)] - 1;
+                int choosenEnemy = (int)possibleEnemies[UnityEngine.Random.Range(0, possibleEnemies.Length)];
 
                 Vector3 localPos = new Vector3(0.001f, -0.002f, 0);
 
-                switch (choosenEnemy + 1)
+                switch (choosenEnemy)
                 {
                     case (int)MainManager.AnimIDs.Cape:
                         enemyID = (int)MainManager.Enemies.Cape;
                         localPos = new Vector3(0.001f, -0.008f, 0);
+                        choosenEnemy--;
                         break;
 
                     case (int)NewAnimID.Frostfly:
