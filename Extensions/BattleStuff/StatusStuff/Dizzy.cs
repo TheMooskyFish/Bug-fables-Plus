@@ -57,15 +57,16 @@ namespace BFPlus.Extensions.BattleStuff.StatusStuff
                     (DamageOverride)NewDamageOverride.StatusDamage
                 };
 
+                int attackerId = attacker.Value.battleentity.battleid;
                 if (extEnt.isPlayer)
                 {
                     extEnt.dizzyRecoil +=
                         battle.DoDamage(null,
-                            ref instance.playerdata[battle.currentturn],
+                            ref instance.playerdata[attackerId],
                             recoilDamage,
                             AttackProperty.NoExceptions, overrides, false
                         );
-                    if (instance.playerdata[battle.currentturn].hp <= 0)
+                    if (instance.playerdata[attackerId].hp <= 0)
                     {
                         dizzyKO = true;
                         extEnt.diedFromDizzy = false;
@@ -73,15 +74,14 @@ namespace BFPlus.Extensions.BattleStuff.StatusStuff
                 }
                 else
                 {
-                    int enemyId = attacker.Value.battleentity.battleid;
                     extEnt.dizzyRecoil +=
                         battle.DoDamage(null,
-                            ref battle.enemydata[enemyId],
+                            ref battle.enemydata[attackerId],
                             recoilDamage,
                             AttackProperty.NoExceptions, overrides, false
                      );
 
-                    if (battle.enemydata[enemyId].hp <= 0)
+                    if (battle.enemydata[attackerId].hp <= 0)
                     {
                         dizzyKO = true;
                         extEnt.diedFromDizzy = false;
