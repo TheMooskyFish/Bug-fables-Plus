@@ -2,6 +2,7 @@
 using BFPlus.Extensions;
 using BFPlus.Extensions.Maps;
 using HarmonyLib;
+using InputIOManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -160,6 +161,9 @@ namespace BFPlus.Patches
             for (int i = 0; i < 3; i++)
             {
                 string filePath = "save" + i + ".dat";
+                if (InputIO.currentbuild == InputIO.Builds.GOG)
+                    filePath = "Saves/" + filePath;
+
                 if (File.Exists(filePath))
                 {
                     DateTime lastWriteTime = File.GetLastWriteTime(filePath);

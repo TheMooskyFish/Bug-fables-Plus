@@ -1282,6 +1282,28 @@ namespace BFPlus.Patches
         }
     }
 
+    [HarmonyPatch(typeof(InputIO), "ReadFile")]
+    public class PatchInputIOReadFile
+    {
+        static void Prefix(ref string path)
+        {
+            if (InputIO.currentbuild != InputIO.Builds.GOG || path.Contains("Saves")) 
+                return;
+            path = "Saves/" + path;
+        }
+    }
+
+    [HarmonyPatch(typeof(InputIO), "StartUp")]
+    public class PatchInputIOStartUp
+    {
+        static void Prefix()
+        {
+            if (Type.GetType("GalaxyManager, Assembly-CSharp") is null) 
+                return;
+            InputIO.currentbuild = InputIO.Builds.GOG;
+        }
+    }
+
 
     [HarmonyPatch(typeof(MainManager), "ShowHUD")]
     public class PatchMainManagerShowHUD
