@@ -530,6 +530,12 @@ namespace BFPlus.Patches
     [HarmonyPatch]
     public class PatchBattleControlDoDamage
     {
+        
+        class State
+        {
+            public bool skipPostfix;
+        }
+
         static MethodBase TargetMethod()
         {
             IEnumerable methods = typeof(BattleControl).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).Where(method => method.Name == "DoDamage").Cast<MethodBase>();
@@ -537,8 +543,9 @@ namespace BFPlus.Patches
         }
         static bool superBlocked = false;
 
-        static bool Prefix(BattleControl __instance, MethodBase __originalMethod, BattleData? attacker, ref BattleData target, ref int damageammount, BattleControl.AttackProperty? property, ref BattleControl.DamageOverride[] overrides, bool block)
+        static bool Prefix(BattleControl __instance, MethodBase __originalMethod, out State __state, BattleData? attacker, ref BattleData target, ref int damageammount, BattleControl.AttackProperty? property, ref BattleControl.DamageOverride[] overrides, bool block)
         {
+            __state = new State();
             bool isDotDamage = BattleControl_Ext.Instance.IsDotDamage(overrides);
             bool targetIsPlayer = target.battleentity.CompareTag("Player");
 
@@ -552,6 +559,7 @@ namespace BFPlus.Patches
             {
                 BattleControl_Ext.Instance.twinedFateUsed = true;
                 __instance.DoDamage(attacker, ref MainManager.instance.playerdata[twinedfateBug], damageammount, property, overrides, block);
+                __state.skipPostfix = true;
                 return false;
             }
 
@@ -622,8 +630,10 @@ namespace BFPlus.Patches
             return true;
         }
 
-        static void Postfix(BattleControl __instance, MethodBase __originalMethod, BattleData? attacker, ref BattleData target, ref int damageammount, AttackProperty? property, DamageOverride[] overrides, bool block, int __result)
+        static void Postfix(BattleControl __instance, MethodBase __originalMethod, State __state, BattleData? attacker, ref BattleData target, ref int damageammount, AttackProperty? property, DamageOverride[] overrides, bool block, int __result)
         {
+            if (__state.skipPostfix)
+                return;
             bool isDotDamage = BattleControl_Ext.Instance.IsDotDamage(overrides);
             bool targetIsPlayer = target.battleentity.CompareTag("Player");
 
