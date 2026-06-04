@@ -1616,6 +1616,7 @@ namespace BFPlus.Extensions
             MainManager.RemoveCondition(MainManager.BattleCondition.Inked, target);
             MainManager.RemoveCondition(MainManager.BattleCondition.Sticky, target);
             MainManager.RemoveCondition((MainManager.BattleCondition)NewCondition.Dizzy, target);
+            MainManager.RemoveCondition((MainManager.BattleCondition)NewCondition.Paintball, target);
 
             int amountCured = conditionAmount - target.condition.Count;
             if (target.battleentity.playerentity && target.hp > 0 && amountCured > 0)

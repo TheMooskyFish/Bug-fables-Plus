@@ -55,6 +55,8 @@ namespace BFPlus.Patches.MainManagerTranspilers
         static void RemoveNewNegativeConditions(int characterId)
         {
             MainManager.RemoveCondition((MainManager.BattleCondition)NewCondition.Dizzy, MainManager.instance.playerdata[characterId]);
+            MainManager.RemoveCondition((MainManager.BattleCondition)NewCondition.Paintball, MainManager.instance.playerdata[characterId]);
+
         }
     }
 
