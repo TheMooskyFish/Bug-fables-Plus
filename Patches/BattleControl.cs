@@ -534,6 +534,11 @@ namespace BFPlus.Patches
         class State
         {
             public bool skipPostfix;
+            public bool superBlocked;
+            public bool isDotDamage;
+            public bool targetIsPlayer;
+            public Entity_Ext targetExt;
+            public int beforeDoDamageHp;
         }
 
         static MethodBase TargetMethod()
@@ -541,21 +546,21 @@ namespace BFPlus.Patches
             IEnumerable methods = typeof(BattleControl).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).Where(method => method.Name == "DoDamage").Cast<MethodBase>();
             return typeof(BattleControl).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).Where(method => method.Name == "DoDamage" && method.GetParameters().Length == 6).FirstOrDefault();
         }
-        static bool superBlocked = false;
 
         static bool Prefix(BattleControl __instance, MethodBase __originalMethod, out State __state, BattleData? attacker, ref BattleData target, ref int damageammount, BattleControl.AttackProperty? property, ref BattleControl.DamageOverride[] overrides, bool block)
         {
             __state = new State();
-            bool isDotDamage = BattleControl_Ext.Instance.IsDotDamage(overrides);
-            bool targetIsPlayer = target.battleentity.CompareTag("Player");
+            __state.isDotDamage = BattleControl_Ext.Instance.IsDotDamage(overrides);
 
-            if (targetIsPlayer && !isDotDamage)
+            __state.targetIsPlayer = target.battleentity.CompareTag("Player");
+
+            if (__state.targetIsPlayer && !__state.isDotDamage)
             {
-                superBlocked = (__instance.GetSuperBlock(target.battleentity.animid) || __instance.superblockedthisframe > 0f) && !__instance.IsStopped(target);
+                __state.superBlocked = (__instance.GetSuperBlock(target.battleentity.animid) || __instance.superblockedthisframe > 0f) && !__instance.IsStopped(target);
             }
 
             int twinedfateBug = BattleControl_Ext.GetEquippedMedalBug(Medal.TwinedFate, (i) => MainManager.instance.playerdata[i].hp > 0 && MainManager.instance.playerdata[i].eatenby == null);
-            if (targetIsPlayer && !isDotDamage && twinedfateBug != -1 && !BattleControl_Ext.Instance.twinedFateUsed && target.trueid != twinedfateBug && target.hp <= 4)
+            if (__state.targetIsPlayer && !__state.isDotDamage && twinedfateBug != -1 && !BattleControl_Ext.Instance.twinedFateUsed && target.trueid != twinedfateBug && target.hp <= 4)
             {
                 BattleControl_Ext.Instance.twinedFateUsed = true;
                 __instance.DoDamage(attacker, ref MainManager.instance.playerdata[twinedfateBug], damageammount, property, overrides, block);
@@ -563,27 +568,27 @@ namespace BFPlus.Patches
                 return false;
             }
 
-            var entityExt = Entity_Ext.GetEntity_Ext(target.battleentity);
+            __state.targetExt = Entity_Ext.GetEntity_Ext(target.battleentity);
 
-            if (targetIsPlayer && MainManager.BadgeIsEquipped((int)Medal.Revengarang) && attacker != null && !isDotDamage && target.trueid == 0 && block && __instance.nonphyscal && !battle.IsStopped(target))
+            if (__state.targetIsPlayer && MainManager.BadgeIsEquipped((int)Medal.Revengarang) && attacker != null && !__state.isDotDamage && target.trueid == 0 && block && __instance.nonphyscal && !battle.IsStopped(target))
             {
                 BattleControl_Ext.Instance.revengarangIsActive = true;
                 BattleControl_Ext.Instance.revengarangDMG = 1 + MainManager.BadgeHowManyEquipped((int)Medal.Revengarang);
-                if (superBlocked)
+                if (__state.superBlocked)
                 {
                     BattleControl_Ext.Instance.revengarangDMG += MainManager.BadgeHowManyEquipped((int)MainManager.BadgeTypes.SuperBlock, 0);
                 }
 
-                if (entityExt.slugskinActive)
+                if (__state.targetExt.slugskinActive)
                     BattleControl_Ext.Instance.revengarangDMG++;
 
             }
 
             BattleControl_Ext.Instance.realDamage = 0;
 
-            entityExt.beforeDoDamageHp = target.hp;
+            __state.beforeDoDamageHp = target.hp;
 
-            if (__instance.chompyattack == null && MainManager.BadgeIsEquipped((int)Medal.Blightfury) && !BattleControl_Ext.Instance.inAiAttack && !isDotDamage)
+            if (__instance.chompyattack == null && MainManager.BadgeIsEquipped((int)Medal.Blightfury) && !BattleControl_Ext.Instance.inAiAttack && !__state.isDotDamage)
             {
                 if (attacker == null)
                 {
@@ -601,8 +606,7 @@ namespace BFPlus.Patches
                 }
             }
 
-            if (!isDotDamage &&
-                !BattleControl_Ext.Instance.firstHitMulti &&
+            if (!__state.isDotDamage && !BattleControl_Ext.Instance.firstHitMulti &&
                 MainManager.BadgeIsEquipped((int)Medal.IgnitedMite) &&
                 MainManager.HasCondition(MainManager.BattleCondition.Fire, target) > -1)
             {
@@ -616,16 +620,17 @@ namespace BFPlus.Patches
                 }
             }
 
-            if (!__instance.enemy && !isDotDamage && __instance.chompyattack == null && BattleControl_Ext.Instance.entityAttacking != null)
+            if (!__instance.enemy && !__state.isDotDamage && __instance.chompyattack == null && BattleControl_Ext.Instance.entityAttacking != null)
             {
                 BattleControl_Ext.Instance.attackedThisTurn.Add(BattleControl_Ext.Instance.entityAttacking.battleid);
             }
 
-            bool attackerIsInked = attacker != null && !isDotDamage && MainManager.HasCondition(MainManager.BattleCondition.Inked, attacker.Value) > -1;
+            bool attackerIsInked = attacker != null && !__state.isDotDamage && MainManager.HasCondition(MainManager.BattleCondition.Inked, attacker.Value) > -1;
+            
             //Smearcharge check
-            if (targetIsPlayer && attackerIsInked && MainManager.BadgeIsEquipped((int)Medal.Smearcharge, target.trueid))
+            if (__state.targetIsPlayer && attackerIsInked && MainManager.BadgeIsEquipped((int)Medal.Smearcharge, target.trueid))
             {
-                entityExt.smearchargeActive = true;
+                __state.targetExt.smearchargeActive = true;
             }
             return true;
         }
@@ -634,13 +639,11 @@ namespace BFPlus.Patches
         {
             if (__state.skipPostfix)
                 return;
-            bool isDotDamage = BattleControl_Ext.Instance.IsDotDamage(overrides);
-            bool targetIsPlayer = target.battleentity.CompareTag("Player");
 
-            if (!isDotDamage)
+            if (!__state.isDotDamage)
                 Dizzy.CheckRecoilDamage(attacker, BattleControl_Ext.Instance.realDamage);
 
-            if (!isDotDamage && targetIsPlayer && target.hp - __result > 0 && MainManager.BadgeIsEquipped((int)Medal.FlashFreeze, target.trueid) && target.hp > 4 && MainManager.HasCondition(MainManager.BattleCondition.Sturdy, target) == -1)
+            if (!__state.isDotDamage && __state.targetIsPlayer && target.hp - __result > 0 && MainManager.BadgeIsEquipped((int)Medal.FlashFreeze, target.trueid) && target.hp > 4 && MainManager.HasCondition(MainManager.BattleCondition.Sturdy, target) == -1)
             {
                 MainManager.RemoveCondition(MainManager.BattleCondition.Freeze, target);
                 MainManager.SetCondition(MainManager.BattleCondition.Freeze, ref target, 3);
@@ -649,25 +652,25 @@ namespace BFPlus.Patches
                 if(target.battleentity.icecube == null)
                     target.battleentity.Freeze();
             }
-            var entityExt = Entity_Ext.GetEntity_Ext(target.battleentity);
-            if (!targetIsPlayer && BadgeIsEquipped((int)Medal.Perkfectionist) && entityExt.beforeDoDamageHp - __result == 0 && __result != 0 && entityExt.beforeDoDamageHp != 0 && target.hp == 0)
+
+            if (!__state.targetIsPlayer && BadgeIsEquipped((int)Medal.Perkfectionist) && __state.beforeDoDamageHp - __result == 0 && __result != 0 && __state.beforeDoDamageHp != 0 && target.hp == 0)
             {
                 BattleControl_Ext.Instance.perfectKill = true;
                 BattleControl_Ext.Instance.perfectKillAmount++;
             }
 
-            if (targetIsPlayer && attacker != null && !isDotDamage && target.trueid == 2)
+            if (__state.targetIsPlayer && attacker != null && !__state.isDotDamage && target.trueid == 2)
             {
-                BattleControl_Ext.Instance.CheckMothflower(superBlocked, block, target);
+                BattleControl_Ext.Instance.CheckMothflower(__state.superBlocked, block, target);
             }
 
-            if (targetIsPlayer && target.hp > 0)
+            if (__state.targetIsPlayer && target.hp > 0)
             {
                 if (__result > 0)
                     BattleControl_Ext.Instance.PotentialEnergyCheck(ref target);
             }
 
-            if (!isDotDamage)
+            if (!__state.isDotDamage)
             {
                 for (int i = 0; i < target.condition.Count; i++)
                 {
@@ -682,13 +685,13 @@ namespace BFPlus.Patches
                     if (target.condition[i][0] == (int)NewCondition.Vitiation &&
                         BattleControl_Ext.Instance.realDamage - __result > 0)
                     {
-                        CheckVitiationDamage(ref target, i, ref attacker, __result, entityExt, targetIsPlayer);
+                        CheckVitiationDamage(ref target, i, ref attacker, __result, __state.targetExt, __state.targetIsPlayer);
                         continue;
                     }
 
-                    if (!(overrides?.Contains((DamageOverride)NewDamageOverride.IgnorePaintball) ?? false) && target.condition[i][0] == (int)NewCondition.Paintball && entityExt.inkBubbleEnabled && entityExt.inkBubble != null && Vector3.Distance(entityExt.inkBubble.transform.localScale, entityExt.extraData.inkBubbleScale) < 0.01f)
+                    if (!(overrides?.Contains((DamageOverride)NewDamageOverride.IgnorePaintball) ?? false) && target.condition[i][0] == (int)NewCondition.Paintball && __state.targetExt.inkBubbleEnabled && __state.targetExt.inkBubble != null && Vector3.Distance(__state.targetExt.inkBubble.transform.localScale, __state.targetExt.extraData.inkBubbleScale) < 0.01f)
                     {
-                        CheckInkBubbleDamage(ref target, i, ref attacker, __result, overrides?.ToList(), targetIsPlayer);
+                        CheckInkBubbleDamage(ref target, i, ref attacker, __result, overrides?.ToList(), __state.targetIsPlayer);
                         continue;
                     }
 
@@ -700,21 +703,21 @@ namespace BFPlus.Patches
                 }
 
 
-                if (targetIsPlayer && target.hp > 0)
+                if (__state.targetIsPlayer && target.hp > 0)
                 {
-                    if (MainManager.BadgeIsEquipped((int)Medal.Slugskin, target.trueid) & superBlocked && MainManager.HasCondition(MainManager.BattleCondition.Sticky, target) != -1)
+                    if (MainManager.BadgeIsEquipped((int)Medal.Slugskin, target.trueid) & __state.superBlocked && MainManager.HasCondition(MainManager.BattleCondition.Sticky, target) != -1)
                     {
                         MainManager.SetCondition((BattleCondition)NewCondition.Slugskin, ref target, 1);
                         MainManager.PlaySound("Shield", 1.4f, 1);
                     }
                 }
 
-                if (!targetIsPlayer)
+                if (!__state.targetIsPlayer)
                 {
-                    BattleControl_Ext.Instance.CheckStrikeBlasters(__instance, target, entityExt.beforeDoDamageHp, entityExt);
+                    BattleControl_Ext.Instance.CheckStrikeBlasters(__instance, target, __state.beforeDoDamageHp, __state.targetExt);
                 }
 
-                if (!__instance.enemy && !targetIsPlayer && __result > BattleControl_Ext.Instance.trustFallDamage)
+                if (!__instance.enemy && !__state.targetIsPlayer && __result > BattleControl_Ext.Instance.trustFallDamage)
                 {
                     if (__instance.turns == BattleControl_Ext.Instance.trustFallTurn + 1 && BattleControl_Ext.Instance.trustFallTurn != -1)
                         BattleControl_Ext.Instance.trustFallDamage = __result;
@@ -722,11 +725,11 @@ namespace BFPlus.Patches
 
                 if (__instance.chompyattack == null)
                 {
-                    BattleControl_Ext.Instance.DoInkWellCheck(__result, ref target, targetIsPlayer);
-                    BattleControl_Ext.Instance.DoWebsheetCheck(attacker, ref target, targetIsPlayer);
+                    BattleControl_Ext.Instance.DoInkWellCheck(__result, ref target, __state.targetIsPlayer);
+                    BattleControl_Ext.Instance.DoWebsheetCheck(attacker, ref target, __state.targetIsPlayer);
                 }
 
-                bool attackerIsInked = attacker != null && !isDotDamage && MainManager.HasCondition(MainManager.BattleCondition.Inked, attacker.Value) > -1;
+                bool attackerIsInked = attacker != null && !__state.isDotDamage && MainManager.HasCondition(MainManager.BattleCondition.Inked, attacker.Value) > -1;
                 if (attackerIsInked && MainManager.BadgeIsEquipped((int)Medal.Inkblot))
                 {
                     var attackerExt = Entity_Ext.GetEntity_Ext(attacker.Value.battleentity);
@@ -740,17 +743,17 @@ namespace BFPlus.Patches
                 }
             }
 
-            if (targetIsPlayer && __result > 0 && MainManager.BadgeIsEquipped((int)Medal.NoPainNoGain))
+            if (__state.targetIsPlayer && __result > 0 && MainManager.BadgeIsEquipped((int)Medal.NoPainNoGain))
             {
                 BattleControl_Ext.Instance.RecoverPlayerTP(1, target);
             }
 
-            if (!isDotDamage && target.animid == (int)NewEnemies.FireAnt && !__instance.IsStopped(target))
+            if (!__state.isDotDamage && target.animid == (int)NewEnemies.FireAnt && !__instance.IsStopped(target))
             {
                 FireAntAI.FireAntHustle(ref target);
             }
 
-            if(!__instance.enemy && !isDotDamage && __instance.chompyattack == null 
+            if(!__instance.enemy && !__state.isDotDamage && __instance.chompyattack == null 
                 && BattleControl_Ext.Instance.entityAttacking != null 
                 && BattleControl_Ext.Instance.entityAttacking.CompareTag("Player") && __instance.currentturn != -1)
             {
@@ -908,7 +911,7 @@ namespace BFPlus.Patches
                 while (flips > 0)
                 {
                     flips--;
-                    if(DamagePipelineHandler.FlipTarget(ref target));
+                    if(DamagePipelineHandler.FlipTarget(ref target))
                         weaknesshit = true;
                 }
             }
