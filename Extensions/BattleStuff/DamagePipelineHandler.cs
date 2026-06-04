@@ -38,7 +38,8 @@ namespace BFPlus.Extensions.BattleStuff
             }
 
             defPierce = overrides.Count(o => (int)o == (int)NewDamageOverride.Pierce1);
-            if (property.HasValue && (property.Value == AttackProperty.Pierce || property.Value == AttackProperty.Atleast1pierce))
+            if (property.HasValue && (property.Value == AttackProperty.Pierce || property.Value == AttackProperty.Atleast1pierce) &&
+                (attacker == null || attacker.Value.battleentity.CompareTag("Player") || attacker.Value.animid >= (int)NewEnemies.Caveling))
             {
                 defPierce = int.MaxValue;
             }
