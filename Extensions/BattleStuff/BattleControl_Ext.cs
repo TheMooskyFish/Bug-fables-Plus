@@ -3492,7 +3492,8 @@ namespace BFPlus.Extensions
                             pmain.startColor = particleColor.Value;
                         }
                     }
-                    damage += 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus);
+                    damage += 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus, 
+                        MainManager.instance.playerdata[battle.currentturn].trueid);
                     battle.DoDamage(null, ref battle.enemydata[target], damage + 2, property, overrides?.ToArray(), false);
                     if (splashRadius > 0 && battle.enemydata.Length > 1)
                     {
@@ -3529,7 +3530,8 @@ namespace BFPlus.Extensions
                     var main = partcle.GetComponent<ParticleSystem>().main;
                     main.startColor = new Color(1f, 0, 1f);
 
-                    damage = 5 + 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus);
+                    damage = 5 + 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus,
+                        MainManager.instance.playerdata[battle.currentturn].trueid);
                     for (int i = 0; i < battle.enemydata.Length; i++)
                     {
                         if (battle.enemydata[i].hp > 0 && battle.enemydata[i].position != BattlePosition.Underground)
@@ -3551,7 +3553,8 @@ namespace BFPlus.Extensions
                     break;
 
                 case (int)NewItem.MysteryBomb:
-                    damage = 5 + 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus);
+                    damage = 5 + 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus, 
+                        MainManager.instance.playerdata[battle.currentturn].trueid);
                     piercedStatusRes = 50;
                     for (int i = 0; i < battle.enemydata.Length; i++)
                     {
@@ -3717,7 +3720,8 @@ namespace BFPlus.Extensions
             int areaDamage = 4;
             if (!usedByEnemy)
             {
-                int bonusDMG = 2 * MainManager.BadgeHowManyEquipped((int)MainManager.BadgeTypes.BombPlus);
+                int bonusDMG = 2 * MainManager.BadgeHowManyEquipped((int)MainManager.BadgeTypes.BombPlus, 
+                    MainManager.instance.playerdata[battle.currentturn].trueid);
                 stickyBombDamage += bonusDMG;
                 areaDamage += bonusDMG;
             }
@@ -3796,7 +3800,8 @@ namespace BFPlus.Extensions
             int amount = 4;
             int damage = 3;
 
-            if (!usedByEnemy && MainManager.BadgeIsEquipped((int)MainManager.BadgeTypes.BombPlus))
+            if (!usedByEnemy && MainManager.BadgeIsEquipped((int)MainManager.BadgeTypes.BombPlus, 
+                    MainManager.instance.playerdata[battle.currentturn].trueid))
                 damage += 2;
 
             Transform[] fireballs = new Transform[2];
@@ -3917,7 +3922,8 @@ namespace BFPlus.Extensions
             }
             else
             {
-                damage += 2 * MainManager.BadgeHowManyEquipped((int)BadgeTypes.BombPlus);
+                damage += 2 * MainManager.BadgeHowManyEquipped((int)BadgeTypes.BombPlus, 
+                    MainManager.instance.playerdata[battle.currentturn].trueid);
                 targetPos = (battle.enemydata[0].battlepos + battle.enemydata[battle.enemydata.Length - 1].battlepos) / 2;
                 targetPos = new Vector3(targetPos.x, 0);
             }
