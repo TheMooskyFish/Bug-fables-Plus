@@ -2598,6 +2598,12 @@ namespace BFPlus.Extensions
 
         IEnumerator DoAbomb(Vector3 position, EntityControl user)
         {
+            int damage = 10;
+            if (!battle.enemy)
+            {
+               damage += 2 * BadgeHowManyEquipped((int)BadgeTypes.BombPlus, 
+                   MainManager.instance.playerdata[battle.currentturn].trueid);
+            }
             MainManager.PlaySound("Splat1");
             MainManager.PlaySound("Fuse");
             GameObject part = Instantiate(Resources.Load("Prefabs/Objects/Abombnation"), position, Quaternion.identity) as GameObject;
@@ -2622,7 +2628,7 @@ namespace BFPlus.Extensions
                     {
                         if (!MainManager.instance.playerdata[i].plating)
                         {
-                            battle.DoDamage(null, ref MainManager.instance.playerdata[i], 10, BattleControl.AttackProperty.NoExceptions, null, false);
+                            battle.DoDamage(null, ref MainManager.instance.playerdata[i], damage, BattleControl.AttackProperty.NoExceptions, null, false);
                         }
                         else
                         {
@@ -2637,11 +2643,11 @@ namespace BFPlus.Extensions
                 {
                     if (battle.enemydata[i].animid == (int)MainManager.Enemies.Abomihoney || battle.enemydata[i].animid == (int)MainManager.Enemies.Ahoneynation)
                     {
-                        battle.Heal(ref battle.enemydata[i], 10, false);
+                        battle.Heal(ref battle.enemydata[i], damage, false);
                     }
                     else
                     {
-                        battle.DoDamage(null, ref battle.enemydata[i], 10, BattleControl.AttackProperty.NoExceptions, null, false);
+                        battle.DoDamage(null, ref battle.enemydata[i], damage, BattleControl.AttackProperty.NoExceptions, null, false);
                     }
                 }
                 else
