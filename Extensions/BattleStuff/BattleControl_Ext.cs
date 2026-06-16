@@ -139,7 +139,6 @@ namespace BFPlus.Extensions
         public JumpAntFight jumpAntFightComp = null;
         public List<Vector3> cleanKilledEnemyPos = new List<Vector3>();
         public StatusInfo statusInfo;
-        public bool inStatusInfo = false;
         public static float mashSuperblockThreshold = -1;
         public static float mashSuperblockTimer = -1;
         public bool noHugeMoveReduction = false;
@@ -509,14 +508,14 @@ namespace BFPlus.Extensions
 
         static void CheckHoloSkill()
         {
-            EntityControl entity = MainManager.instance.playerdata[MainManager.battle.currentturn].battleentity;
+            EntityControl entity = MainManager.instance.playerdata[battle.currentturn].battleentity;
             if (Instance.holoSkillID != -1 && entity.CompareTag("Player"))
             {
-                MainManager.battle.StartCoroutine(Instance.UseHoloSkill(entity, MainManager.battle.selecteditem));
+                battle.StartCoroutine(Instance.UseHoloSkill(entity, battle.selecteditem));
             }
             else
             {
-                MainManager.battle.StartCoroutine(battle.DoAction(entity, battle.selecteditem));
+                battle.StartCoroutine(battle.DoAction(entity, battle.selecteditem));
             }
         }
 
@@ -555,8 +554,6 @@ namespace BFPlus.Extensions
             entity.spin = Vector3.zero;
             MainManager.battle.StartCoroutine(battle.DoAction(entity, actionid));
         }
-
-
 
         IEnumerator DoWildfire()
         {

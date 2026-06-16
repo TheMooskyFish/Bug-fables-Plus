@@ -6,6 +6,7 @@ using MonoMod.Cil;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.WSA;
 using static BattleControl;
 using static MainManager;
 
@@ -58,27 +59,27 @@ namespace BFPlus.Patches.BattleControlTranspilers.AdvanceMainTurnPatches
             priority = 10360;
         }
 
-        protected override void ApplyPatch(ILCursor c, ILContext context)
+        protected override void ApplyPatch(ILCursor cursor, ILContext context)
         {
-            c.GotoNext(x => x.MatchCall(AccessTools.Method(typeof(UnityEngine.Object), "Destroy", new Type[] { typeof(UnityEngine.Object) })));
-            c.GotoPrev(MoveType.After, x => x.MatchLdarg(0));
-            var currentDelProjIndex = c.Next.Operand;
-            c.GotoPrev(MoveType.After, x => x.MatchLdloc(1));
-            int destroyIndex = c.Index;
+            cursor.GotoNext(x => x.MatchCall(AccessTools.Method(typeof(UnityEngine.Object), "Destroy", new Type[] { typeof(UnityEngine.Object) })));
+            cursor.GotoPrev(MoveType.After, x => x.MatchLdarg(0));
+            var currentDelProjIndex = cursor.Next.Operand;
+            cursor.GotoPrev(MoveType.After, x => x.MatchLdloc(1));
+            int destroyIndex = cursor.Index;
 
-            c.GotoNext(x => x.MatchCall(AccessTools.Method(typeof(BattleControl), nameof(BattleControl.RemoveDelayedProjectile))));
-            c.GotoPrev(x => x.MatchLdloc(1));
-            ILLabel skipToLabel = c.MarkLabel();
-            c.Goto(destroyIndex);
+            cursor.GotoNext(x => x.MatchCall(AccessTools.Method(typeof(BattleControl), nameof(BattleControl.RemoveDelayedProjectile))));
+            cursor.GotoPrev(x => x.MatchLdloc(1));
+            ILLabel skipToLabel = cursor.MarkLabel();
+            cursor.Goto(destroyIndex);
 
-            c.Prev.OpCode = OpCodes.Nop;
-            c.Emit(OpCodes.Ldarg_0);
-            c.Emit(OpCodes.Ldarg_0);
-            c.Emit(OpCodes.Ldfld, currentDelProjIndex);
-            c.Emit(OpCodes.Call, AccessTools.Method(typeof(PatchDelProjExtraEffects), "DoExtraEffect"));
-            Utils.InsertYieldReturn(c);
-            c.Emit(OpCodes.Br, skipToLabel);
-            c.Emit(OpCodes.Ldloc_1);
+            cursor.Prev.OpCode = OpCodes.Nop;
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, currentDelProjIndex);
+            cursor.Emit(OpCodes.Call, AccessTools.Method(typeof(PatchDelProjExtraEffects), "DoExtraEffect"));
+            Utils.InsertYieldReturn(cursor);
+            cursor.Emit(OpCodes.Br, skipToLabel);
+            cursor.Emit(OpCodes.Ldloc_1);
         }
 
         static IEnumerator DoExtraEffect(int projIndex)

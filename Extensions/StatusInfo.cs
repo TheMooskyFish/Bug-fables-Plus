@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -198,7 +199,6 @@ namespace BFPlus.Extensions
 
         public IEnumerator ShowStatusInfo()
         {
-            BattleControl_Ext.Instance.inStatusInfo = !BattleControl_Ext.Instance.inStatusInfo;
             RefreshEnemyIcons();
             option = 0;
             MainManager.battle.action = true;

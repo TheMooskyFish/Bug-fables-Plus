@@ -602,6 +602,7 @@
     <Compile Include="Patches\BattleControlTranspilers\AddExperiencePatches\PatchResetMaxHP.cs" />
     <Compile Include="Patches\BattleControlTranspilers\AddExperiencePatches\PatchWinJingleCheck.cs" />
     <Compile Include="Patches\BattleControlTranspilers\AdvanceMainTurnPatches\PatchAreaDamageDelProj.cs" />
+    <Compile Include="Patches\BattleControlTranspilers\AdvanceMainTurnPatches\PatchDelProjYieldCheckDead.cs" />
     <Compile Include="Patches\BattleControlTranspilers\AdvanceMainTurnPatches\PatchEndOfTurnChecks.cs" />
     <Compile Include="Patches\BattleControlTranspilers\AdvanceMainTurnPatches\PatchMaxCharge.cs" />
     <Compile Include="Patches\BattleControlTranspilers\AdvanceMainTurnPatches\PatchNoActionEven.cs" />
