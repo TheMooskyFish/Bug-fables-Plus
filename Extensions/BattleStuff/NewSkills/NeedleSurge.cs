@@ -49,12 +49,12 @@ namespace BFPlus.Extensions.BattleStuff.Skills
 
             public virtual void Update()
             {
-                sprite.transform.position += vel;
+                sprite.transform.position += vel * 60 * Time.deltaTime;
 
                 SetScale();
 
                 if (life > 0)
-                    life -= 1 / lifetime;
+                    life -= 60f * Time.deltaTime / lifetime;
                 else
                     Destroy(sprite.gameObject);
             }
